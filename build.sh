@@ -1,0 +1,1 @@
+gcc nanovi.c nano_libc_host.c -o nvi
