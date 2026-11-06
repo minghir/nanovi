@@ -1,1 +1,1 @@
-gcc vi.c nano_libc_host.c -o vi
+make
