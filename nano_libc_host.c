@@ -93,7 +93,7 @@ char nano_read_char(void) {
 }
 
 // --- Randare Ecran pe Linux ---
-
+/*
 void nano_draw_full_screen(const uint16_t* buffer) {
     if (!buffer) return;
 
@@ -128,6 +128,53 @@ void nano_draw_full_screen(const uint16_t* buffer) {
     }
     
     printf("\033[0m");
+    fflush(stdout);
+}
+*/
+extern int SCREEN_ROWS;
+extern int SCREEN_COLS;
+
+void nano_draw_full_screen(const uint16_t* buffer) {
+    if (!buffer) return;
+
+    int cols = SCREEN_COLS > 0 ? SCREEN_COLS : 80;
+    int rows = SCREEN_ROWS > 0 ? SCREEN_ROWS : 24;
+
+    // Ascundem cursorul în timpul randării ca să evităm pâlpâirea
+    printf("\033[?25l");
+
+    uint16_t last_attr = 0xFFFF;
+
+    for (int r = 0; r < rows; r++) {
+        // Ancorăm explicit începutul fiecărui rând la coloana 1
+        printf("\033[%d;1H", r + 1);
+        int row_offset = r * cols;
+
+        for (int c = 0; c < cols; c++) {
+            uint16_t cell = buffer[row_offset + c];
+            uint16_t attr = cell & 0xFF00;
+            unsigned char ch = (unsigned char)(cell & 0x00FF);
+
+            // Înlocuim orice caracter de control neprintabil cu spațiu
+            if (ch < 32 || ch == 127) {
+                ch = ' ';
+            }
+
+            if (attr != last_attr) {
+                if (attr == 0x0B00 || attr == 0x7000) {
+                    printf("\033[7m"); // Video invers (status bar / selecție)
+                } else {
+                    printf("\033[0m"); // Normal
+                }
+                last_attr = attr;
+            }
+
+            putchar(ch);
+        }
+    }
+
+    // Resetăm culorile și reafişăm cursorul
+    printf("\033[0m\033[?25h");
     fflush(stdout);
 }
 
