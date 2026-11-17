@@ -1,0 +1,4 @@
+name: c
+extensions: .c .h
+comment: //
+keywords: if else while for return int char void struct typedef enum long float double sizeof break continue switch case default

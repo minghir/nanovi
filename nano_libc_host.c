@@ -161,10 +161,26 @@ void nano_draw_full_screen(const uint16_t* buffer) {
             }
 
             if (attr != last_attr) {
-                if (attr == 0x0B00 || attr == 0x7000) {
-                    printf("\033[7m"); // Video invers (status bar / selecție)
-                } else {
-                    printf("\033[0m"); // Normal
+                switch (attr) {
+                    case 0x0B00:
+                    case 0x7000:
+                        printf("\033[0;7m");    // Video invers (Status bar / Selecție)
+                        break;
+                    case 0x0900:
+                        printf("\033[0;94m");   // Albastru deschis (Keywords)
+                        break;
+                    case 0x0A00:
+                        printf("\033[0;92m");   // Verde deschis (Strings)
+                        break;
+                    case 0x0700:
+                        printf("\033[0;90m");   // Gri închis (Comments)
+                        break;
+                    case 0x0E00:
+                        printf("\033[0;93m");   // Galben deschis (Numbers)
+                        break;
+                    default:
+                        printf("\033[0m");      // Normal (Alb)
+                        break;
                 }
                 last_attr = attr;
             }
